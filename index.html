@@ -168,6 +168,30 @@
           height: 140px;
         }
       }
+      
+      .clickable-hobby {
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-block;
+      }
+      .clickable-hobby:hover {
+        color: #fff;
+        text-shadow: 0 0 10px var(--primary-gold);
+        transform: scale(1.05);
+      }
+      
+      .game-banner {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 2px solid var(--primary-gold);
+        transition: transform 0.3s ease;
+      }
+      .game-banner:hover {
+        transform: scale(1.03);
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+      }
     </style>
   </head>
   <body>
@@ -285,7 +309,7 @@
                 <span class="detail-label">NAMA:</span><br />Palwa Abiyyu Jaya
               </p>
               <p><span class="detail-label">NPM:</span><br />2417051002</p>
-              <p><span class="detail-label">HOBI:</span><br />Gaming</p>
+              <p><span class="detail-label">HOBI:</span><br /><span class="clickable-hobby" data-bs-toggle="modal" data-bs-target="#modalPalwaGames">Gaming</span></p>
               <p><span class="detail-label">ASAL DAERAH:</span><br />Lampung</p>
               <p>
                 <span class="detail-label">TANGGAL LAHIR:</span><br />-- Isi
@@ -353,6 +377,39 @@
                 <span class="detail-label">TANGGAL LAHIR:</span><br />-- Isi
                 Sendiri --
               </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="modalPalwaGames" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Recent Played - Palwa</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p class="text-center text-secondary mb-4">Daftar game yang baru saja dimainkan</p>
+            <div class="row g-3 justify-content-center">
+              <div class="col-md-4 col-6">
+                <img src="ysx.jpg" class="game-banner" alt="Ys X: Proud Nordics" />
+                <p class="text-center small mt-2 mb-0" style="color: var(--primary-gold);">Ys X: Proud Nordics</p>
+              </div>
+              <div class="col-md-4 col-6">
+                <img src="oblivion.jpg" class="game-banner" alt="The Elder Scrolls IV: Oblivion" />
+                <p class="text-center small mt-2 mb-0" style="color: var(--primary-gold);">The Elder Scrolls IV: Oblivion</p>
+              </div>
+              <div class="col-md-4 col-6">
+                <img src="starsand.jpg" class="game-banner" alt="Starsand Island" />
+                <p class="text-center small mt-2 mb-0" style="color: var(--primary-gold);">Starsand Island</p>
+              </div>
             </div>
           </div>
         </div>
