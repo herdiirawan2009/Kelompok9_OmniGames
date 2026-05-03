@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daftar - OMNIGAMES</title>
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body>
+    <header class="header">
+      <div class="logo">
+        <h1>OMNIGAMES</h1>
+      </div>
+      <nav class="navbar">
+        <a href="index.html">Beranda</a>
+        <a href="katalog.html">Katalog Game</a>
+        <a href="marketplace.html">Marketplace</a>
+        <a href="bantuan.html">Bantuan</a>
+      </nav>
+      <div class="user-menu">
+        <a href="masuk.html" class="btn-login">Masuk</a>
+        <a
+          href="daftar.html"
+          class="btn-register"
+          style="
+            background-color: transparent;
+            color: #ffd700;
+            border: 1px solid #ffd700;
+          "
+          >Daftar</a
+        >
+      </div>
+    </header>
+
+    <main class="container auth-container">
+      <div class="auth-card">
+        <h2>Buat Akun Baru</h2>
+
+        <form action="javascript:void(0)">
+          <div class="form-group">
+            <label class="form-label">Nama Lengkap</label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Masukkan nama lengkap"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input
+              type="email"
+              class="form-control"
+              placeholder="Masukkan alamat email"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input
+              type="password"
+              class="form-control"
+              placeholder="Buat password"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Konfirmasi Password</label>
+            <input
+              type="password"
+              class="form-control"
+              placeholder="Ulangi password"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Daftar Sebagai</label>
+            <select class="form-control" required>
+              <option value="user">Pembeli / User</option>
+              <option value="developer">Penjual / Developer</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn-auth">Daftar Sekarang</button>
+        </form>
+
+        <div class="auth-links">
+          <p>Sudah punya akun? <a href="masuk.html">Masuk di sini</a></p>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-content">
+        <h3>OMNIGAMES</h3>
+        <p>
+          Platform marketplace dan portal informasi game digital terpercaya di
+          Indonesia.
+        </p>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 OMNIGAMES Project. All rights reserved.</p>
+      </div>
+    </footer>
+  </body>
+</html>
