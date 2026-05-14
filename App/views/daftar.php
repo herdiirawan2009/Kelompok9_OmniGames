@@ -13,14 +13,14 @@
       </div>
       <nav class="navbar">
         <a href="index.php">Beranda</a>
-        <a href="katalog.php">Katalog Game</a>
-        <a href="marketplace.php">Marketplace</a>
-        <a href="bantuan.php">Bantuan</a>
+        <a href="index.php?route=katalog">Katalog Game</a>
+        <a href="index.php?route=marketplace">Marketplace</a>
+        <a href="index.php?route=bantuan">Bantuan</a>
       </nav>
 
       <div class="user-menu">
-        <a href="masuk.php" class="btn-login">Masuk</a>
-        <a href="daftar.php" class="btn-register" style="background-color: transparent; color: #ffd700; border: 1px solid #ffd700; font-weight: bold;">
+        <a href="index.php?route=masuk" class="btn-login">Masuk</a>
+        <a href="index.php?route=daftar" class="btn-register" style="background-color: transparent; color: #ffd700; border: 1px solid #ffd700; font-weight: bold;">
           Daftar
         </a>
       </div>
@@ -64,7 +64,7 @@
         </form>
 
         <div class="auth-links">
-          <p>Sudah punya akun? <a href="masuk.php">Masuk di sini</a></p>
+          <p>Sudah punya akun? <a href="index.php?route=masuk">Masuk di sini</a></p>
         </div>
       </div>
     </main>

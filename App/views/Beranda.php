@@ -1,18 +1,3 @@
-<?php
-$database = new Database();
-$db = $database->getConnection();
-
-if (!$db) {
-    echo "Gagal terhubung ke database.";
-    exit;
-}
-
-$queryPopuler = "SELECT * FROM games WHERE is_populer = 1 LIMIT 3";
-$resultPopuler = $db->query($queryPopuler);
-
-$queryTerbaru = "SELECT * FROM games ORDER BY tanggal_rilis DESC LIMIT 3";
-$resultTerbaru = $db->query($queryTerbaru);
-?>
 <!doctype html>
 <html lang="id">
   <head>
@@ -28,13 +13,13 @@ $resultTerbaru = $db->query($queryTerbaru);
       </div>
       <nav class="navbar">
         <a href="index.php" style="color: #ffd700; font-weight: bold">Beranda</a>
-        <a href="katalog.php">Katalog Game</a>
-        <a href="marketplace.php">Marketplace</a>
-        <a href="bantuan.php">Bantuan</a>
+        <a href="index.php?route=katalog">Katalog Game</a>
+        <a href="index.php?route=marketplace">Marketplace</a>
+        <a href="index.php?route=bantuan">Bantuan</a>
       </nav>
       <div class="user-menu">
-        <a href="masuk.php" class="btn-login">Masuk</a>
-        <a href="daftar.php" class="btn-register">Daftar</a>
+        <a href="index.php?route=masuk" class="btn-login">Masuk</a>
+        <a href="index.php?route=daftar" class="btn-register">Daftar</a>
       </div>
     </header>
 
@@ -54,13 +39,13 @@ $resultTerbaru = $db->query($queryTerbaru);
 
       <div class="section-header">
         <h3>Rekomendasi Terpopuler</h3>
-        <a href="katalog.php" class="view-all">Lihat Semua</a>
+        <a href="index.php?route=katalog" class="view-all">Lihat Semua</a>
       </div>
 
       <div class="game-grid">
         <?php while($row = $resultPopuler->fetch_assoc()): ?>
         <div class="game-card">
-          <img src="public/js/<?php echo $row['gambar']; ?>" alt="<?php echo $row['judul']; ?>" class="game-img" />
+          <img src="public/Image/<?php echo $row['gambar']; ?>" alt="<?php echo $row['judul']; ?>" class="game-img" />
           <div class="game-body">
             <h4><?php echo $row['judul']; ?></h4>
             <p class="genre"><?php echo $row['genre']; ?></p>
@@ -71,8 +56,8 @@ $resultTerbaru = $db->query($queryTerbaru);
             </div>
           </div>
           <div class="game-footer">
-            <a href="detail.php?id=<?php echo $row['id']; ?>" class="btn-detail">Lihat Detail</a>
-            <a href="marketplace.php?beli=<?php echo $row['id']; ?>" class="btn-buy">Beli Sekarang</a>
+            <a href="index.php?route=detail&id=<?php echo $row['id']; ?>" class="btn-detail">Lihat Detail</a>
+            <a href="index.php?route=marketplace&beli=<?php echo $row['id']; ?>" class="btn-buy">Beli Sekarang</a>
           </div>
         </div>
         <?php endwhile; ?>
@@ -80,13 +65,13 @@ $resultTerbaru = $db->query($queryTerbaru);
 
       <div class="section-header">
         <h3>Baru Dirilis</h3>
-        <a href="katalog.php" class="view-all">Lihat Semua</a>
+        <a href="index.php?route=katalog" class="view-all">Lihat Semua</a>
       </div>
 
       <div class="game-grid">
         <?php while($row = $resultTerbaru->fetch_assoc()): ?>
         <div class="game-card">
-          <img src="public/js/<?php echo $row['gambar']; ?>" alt="<?php echo $row['judul']; ?>" class="game-img" />
+          <img src="public/Image/<?php echo $row['gambar']; ?>" alt="<?php echo $row['judul']; ?>" class="game-img" />
           <div class="game-body">
             <h4><?php echo $row['judul']; ?></h4>
             <p class="genre"><?php echo $row['genre']; ?></p>
@@ -97,8 +82,8 @@ $resultTerbaru = $db->query($queryTerbaru);
             </div>
           </div>
           <div class="game-footer">
-            <a href="detail.php?id=<?php echo $row['id']; ?>" class="btn-detail">Lihat Detail</a>
-            <a href="marketplace.php?beli=<?php echo $row['id']; ?>" class="btn-buy">Beli Sekarang</a>
+            <a href="index.php?route=detail&id=<?php echo $row['id']; ?>" class="btn-detail">Lihat Detail</a>
+            <a href="index.php?route=marketplace&beli=<?php echo $row['id']; ?>" class="btn-buy">Beli Sekarang</a>
           </div>
         </div>
         <?php endwhile; ?>

@@ -1,20 +1,13 @@
 <?php
-$database = new Database();
-$db = $database->getConnection();
-
-$id = isset($_GET['id']) ? intval($_GET['id']) : 1;
-
-$queryGame = "SELECT * FROM games WHERE id = $id";
-$resultGame = $db->query($queryGame);
-$game = $resultGame->fetch_assoc();
-
-if (!$game) {
-    echo "Game tidak ditemukan.";
-    exit;
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
 
-$queryUlasan = "SELECT * FROM ulasan WHERE game_id = $id ORDER BY id DESC";
-$resultUlasan = $db->query($queryUlasan);
+if (!$game) {
+    echo "<h1>Game tidak ditemukan.</h1>";
+    echo "<a href='index.php?route=katalog'>Kembali ke Katalog</a>";
+    exit;
+}
 ?>
 <!doctype html>
 <html lang="id">
@@ -31,20 +24,20 @@ $resultUlasan = $db->query($queryUlasan);
       </div>
       <nav class="navbar">
         <a href="index.php">Beranda</a>
-        <a href="katalog.php">Katalog Game</a>
-        <a href="marketplace.php">Marketplace</a>
-        <a href="bantuan.php">Bantuan</a>
+        <a href="index.php?route=katalog">Katalog Game</a>
+        <a href="index.php?route=marketplace">Marketplace</a>
+        <a href="index.php?route=bantuan">Bantuan</a>
       </nav>
       <div class="user-menu">
-        <a href="masuk.php" class="btn-login">Masuk</a>
-        <a href="daftar.php" class="btn-register">Daftar</a>
+        <a href="index.php?route=masuk" class="btn-login">Masuk</a>
+        <a href="index.php?route=daftar" class="btn-register">Daftar</a>
       </div>
     </header>
 
     <main class="container">
       <div class="detail-header">
         <img
-          src="public/js/<?php echo $game['gambar']; ?>"
+          src="public/Image/<?php echo $game['gambar']; ?>"
           alt="<?php echo $game['judul']; ?>"
           class="detail-img"
         />
@@ -53,7 +46,7 @@ $resultUlasan = $db->query($queryUlasan);
           <p class="detail-genre"><?php echo $game['genre']; ?></p>
           <div class="detail-rating">⭐ <?php echo $game['rating']; ?> / 5.0</div>
           <div class="detail-price">Rp <?php echo number_format($game['harga'], 0, ',', '.'); ?></div>
-          <a href="marketplace.php?beli=<?php echo $game['id']; ?>" class="btn-buy-large">
+          <a href="index.php?route=marketplace&beli=<?php echo $game['id']; ?>" class="btn-buy-large">
             Tambahkan ke Keranjang
           </a>
         </div>
@@ -101,7 +94,7 @@ $resultUlasan = $db->query($queryUlasan);
         </div>
 
         <div class="review-list">
-          <?php if ($resultUlasan->num_rows > 0): ?>
+          <?php if ($resultUlasan && $resultUlasan->num_rows > 0): ?>
             <?php while($ulasan = $resultUlasan->fetch_assoc()): ?>
               <div class="review-card">
                 <div class="review-header">

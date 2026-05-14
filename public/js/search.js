@@ -35,9 +35,6 @@ function handleSearch() {
     return;
   }
 
-  // Dengan adanya router dan tag <base>, kita bisa langsung mengarahkan
-  // ke route 'katalog' dari halaman manapun.
-  // URL akan menjadi /.../katalog?q=keyword
   window.location.href = `katalog?q=${encodeURIComponent(keyword)}`;
 }
 

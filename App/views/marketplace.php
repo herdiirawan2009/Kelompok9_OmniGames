@@ -1,10 +1,16 @@
 <?php
-session_start(); 
-$database = new Database();
-$db = $database->getConnection();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = array();
+}
+
+if (!isset($db) || !($db instanceof mysqli)) {
+    require_once __DIR__ . '/../models/Database.php';
+    $database = new Database();
+    $db = $database->getConnection();
 }
 
 if (isset($_GET['beli'])) {
@@ -12,7 +18,7 @@ if (isset($_GET['beli'])) {
     if (!in_array($id_beli, $_SESSION['cart'])) {
         $_SESSION['cart'][] = $id_beli;
     }
-    header("Location: marketplace.php");
+    header("Location: index.php?route=marketplace");
     exit;
 }
 
@@ -20,9 +26,9 @@ if (isset($_GET['hapus'])) {
     $id_hapus = intval($_GET['hapus']);
     if (($key = array_search($id_hapus, $_SESSION['cart'])) !== false) {
         unset($_SESSION['cart'][$key]);
-        $_SESSION['cart'] = array_values($_SESSION['cart']); // Re-index array
+        $_SESSION['cart'] = array_values($_SESSION['cart']); 
     }
-    header("Location: marketplace.php");
+    header("Location: index.php?route=marketplace");
     exit;
 }
 
@@ -30,24 +36,24 @@ $cart_items = [];
 $total_harga = 0;
 
 if (!empty($_SESSION['cart'])) {
-    $ids = implode(',', $_SESSION['cart']); 
+    $ids = implode(',', array_map('intval', $_SESSION['cart']));
     $query = "SELECT * FROM games WHERE id IN ($ids)";
     $result = $db->query($query);
     
     if ($result && $result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $cart_items[] = $row;
-            $total_harga += $row['harga']; // Hitung subtotal
+            $total_harga += $row['harga'];
         }
     }
 }
 
-$pajak = $total_harga * 0.11; // Pajak 11%
+$pajak = $total_harga * 0.11; 
 $total_bayar = $total_harga + $pajak;
 $jumlah_game = count($cart_items);
 ?>
 <!doctype html>
-<html lang="id">
+<html lang="id">~
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -61,13 +67,13 @@ $jumlah_game = count($cart_items);
       </div>
       <nav class="navbar">
         <a href="index.php">Beranda</a>
-        <a href="katalog.php">Katalog Game</a>
-        <a href="marketplace.php" style="color: #ffd700; font-weight: bold">Marketplace</a>
-        <a href="bantuan.php">Bantuan</a>
+        <a href="index.php?route=katalog">Katalog Game</a>
+        <a href="index.php?route=marketplace" style="color: #ffd700; font-weight: bold">Marketplace</a>
+        <a href="index.php?route=bantuan">Bantuan</a>
       </nav>
       <div class="user-menu">
-        <a href="masuk.php" class="btn-login">Masuk</a>
-        <a href="daftar.php" class="btn-register">Daftar</a>
+        <a href="index.php?route=masuk" class="btn-login">Masuk</a>
+        <a href="index.php?route=daftar" class="btn-register">Daftar</a>
       </div>
     </header>
 
@@ -81,7 +87,7 @@ $jumlah_game = count($cart_items);
           <?php foreach ($cart_items as $item): ?>
             <div class="cart-item">
               <img
-                src="public/js/<?php echo $item['gambar']; ?>"
+                src="public/Image/<?php echo $item['gambar']; ?>"
                 alt="<?php echo $item['judul']; ?>"
                 class="cart-img"
               />
@@ -91,14 +97,14 @@ $jumlah_game = count($cart_items);
               </div>
               <div class="cart-price">
                 <p>Rp <?php echo number_format($item['harga'], 0, ',', '.'); ?></p>
-                <a href="marketplace.php?hapus=<?php echo $item['id']; ?>" class="btn-remove">Hapus</a>
+                <a href="index.php?route=marketplace&hapus=<?php echo $item['id']; ?>" class="btn-remove">Hapus</a>
               </div>
             </div>
           <?php endforeach; ?>
         <?php else: ?>
           <div style="text-align: center; padding: 40px 0;">
             <p>Keranjang belanja kamu masih kosong.</p>
-            <a href="katalog.php" style="color: #ffd700; text-decoration: none; margin-top: 10px; display: inline-block;">Mulai Belanja</a>
+            <a href="index.php?route=katalog" style="color: #ffd700; text-decoration: none; margin-top: 10px; display: inline-block;">Mulai Belanja</a>
           </div>
         <?php endif; ?>
       </div>
@@ -120,7 +126,8 @@ $jumlah_game = count($cart_items);
           <span>Rp <?php echo number_format($total_bayar, 0, ',', '.'); ?></span>
         </div>
 
-        <form action="proses_pembayaran.php" method="POST">
+        <form action="index.php" method="GET">
+          <input type="hidden" name="route" value="masuk">
           <div class="payment-method">
             <p>Metode Pembayaran:</p>
             <select name="metode_pembayaran" class="payment-select" required>

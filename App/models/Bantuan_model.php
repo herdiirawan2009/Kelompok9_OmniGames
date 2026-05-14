@@ -8,5 +8,18 @@ class Bantuan_model {
 
     public function kirimPesan($data) {
         $query = "INSERT INTO kontak_admin (nama, email, kategori, pesan) VALUES (?, ?, ?, ?)";
+        $stmt = $this->db->prepare($query);
+        
+        if ($stmt) {
+            $stmt->bind_param(
+                "ssss", 
+                $data['nama'], 
+                $data['email'], 
+                $data['kategori'], 
+                $data['pesan']
+            );
+            return $stmt->execute();
+        }
+        return false;
     }
 }

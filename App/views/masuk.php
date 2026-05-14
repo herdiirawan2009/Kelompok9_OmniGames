@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 if (isset($_SESSION['user_id'])) {
     header("Location: index.php");
@@ -21,17 +23,17 @@ if (isset($_SESSION['user_id'])) {
       </div>
       <nav class="navbar">
         <a href="index.php">Beranda</a>
-        <a href="katalog.php">Katalog Game</a>
-        <a href="marketplace.php">Marketplace</a>
-        <a href="bantuan.php">Bantuan</a>
+        <a href="index.php?route=katalog">Katalog Game</a>
+        <a href="index.php?route=marketplace">Marketplace</a>
+        <a href="index.php?route=bantuan">Bantuan</a>
       </nav>
       <div class="user-menu">
         <a
-          href="masuk.php"
+          href="index.php?route=masuk"
           class="btn-login"
           style="background-color: #ffd700; color: #000000; font-weight: bold"
         >Masuk</a>
-        <a href="daftar.php" class="btn-register">Daftar</a>
+        <a href="index.php?route=daftar" class="btn-register">Daftar</a>
       </div>
     </header>
 
@@ -43,7 +45,7 @@ if (isset($_SESSION['user_id'])) {
             <div style="color: #ff4d4d; background: rgba(255, 77, 77, 0.1); padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center;">
                 <?php 
                     echo $_SESSION['error_login']; 
-                    unset($_SESSION['error_login']); // Hapus pesan setelah ditampilkan
+                    unset($_SESSION['error_login']); 
                 ?>
             </div>
         <?php endif; ?>
@@ -76,7 +78,7 @@ if (isset($_SESSION['user_id'])) {
 
         <div class="auth-links">
           <a href="javascript:alert('Fitur reset password akan segera hadir!')">Lupa Password?</a>
-          <p>Belum punya akun? <a href="daftar.php">Daftar sekarang</a></p>
+          <p>Belum punya akun? <a href="index.php?route=daftar">Daftar sekarang</a></p>
         </div>
       </div>
     </main>
@@ -84,9 +86,7 @@ if (isset($_SESSION['user_id'])) {
     <footer class="footer">
       <div class="footer-content">
         <h3>OMNIGAMES</h3>
-        <p>
-          Platform marketplace dan portal informasi game digital terpercaya di Indonesia.
-        </p>
+        <p>Platform marketplace dan portal informasi game digital terpercaya di Indonesia.</p>
       </div>
       <div class="footer-bottom">
         <p>&copy; <?php echo date('Y'); ?> OMNIGAMES Project. All rights reserved.</p>

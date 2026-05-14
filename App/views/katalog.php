@@ -1,10 +1,3 @@
-<?php
-$database = new Database();
-$db = $database->getConnection();
-
-$query = "SELECT * FROM games ORDER BY id ASC";
-$result = $db->query($query);
-?>
 <!doctype html>
 <html lang="id">
   <head>
@@ -20,13 +13,13 @@ $result = $db->query($query);
       </div>
       <nav class="navbar">
         <a href="index.php">Beranda</a>
-        <a href="katalog.php" style="color: #ffd700; font-weight: bold">Katalog Game</a>
-        <a href="marketplace.php">Marketplace</a>
-        <a href="bantuan.php">Bantuan</a>
+        <a href="index.php?route=katalog" style="color: #ffd700; font-weight: bold">Katalog Game</a>
+        <a href="index.php?route=marketplace">Marketplace</a>
+        <a href="index.php?route=bantuan">Bantuan</a>
       </nav>
       <div class="user-menu">
-        <a href="masuk.php" class="btn-login">Masuk</a>
-        <a href="daftar.php" class="btn-register">Daftar</a>
+        <a href="index.php?route=masuk" class="btn-login">Masuk</a>
+        <a href="index.php?route=daftar" class="btn-register">Daftar</a>
       </div>
     </header>
 
@@ -51,11 +44,11 @@ $result = $db->query($query);
 
     <main class="container">
       <div class="game-grid">
-        <?php if ($result->num_rows > 0): ?>
+        <?php if ($result && $result->num_rows > 0): ?>
           <?php while($row = $result->fetch_assoc()): ?>
             <div class="game-card">
               <img
-                src="public/js/<?php echo $row['gambar']; ?>"
+                src="public/Image/<?php echo $row['gambar']; ?>"
                 alt="<?php echo $row['judul']; ?>"
                 class="game-img"
               />
@@ -69,8 +62,8 @@ $result = $db->query($query);
                 </div>
               </div>
               <div class="game-footer">
-                <a href="detail.php?id=<?php echo $row['id']; ?>" class="btn-detail">Lihat Detail</a>
-                <a href="marketplace.php?beli=<?php echo $row['id']; ?>" class="btn-buy">Beli Sekarang</a>
+                <a href="index.php?route=detail&id=<?php echo $row['id']; ?>" class="btn-detail">Lihat Detail</a>
+                <a href="index.php?route=marketplace&beli=<?php echo $row['id']; ?>" class="btn-buy">Beli Sekarang</a>
               </div>
             </div>
           <?php endwhile; ?>
@@ -80,7 +73,7 @@ $result = $db->query($query);
       </div>
 
       <div class="pagination">
-        <a href="katalog.php?page=1" class="page-btn active">1</a>
+        <a href="index.php?route=katalog&page=1" class="page-btn active">1</a>
         <a href="#" class="page-btn">2</a>
         <a href="#" class="page-btn">3</a>
         <a href="#" class="page-btn">Selanjutnya &raquo;</a>

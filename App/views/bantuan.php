@@ -13,70 +13,55 @@
       </div>
       <nav class="navbar">
         <a href="index.php">Beranda</a>
-        <a href="katalog.php">Katalog Game</a>
-        <a href="marketplace.php">Marketplace</a>
-        <a href="bantuan.php" style="color: #ffd700; font-weight: bold">Bantuan</a>
+        <a href="index.php?route=katalog">Katalog Game</a>
+        <a href="index.php?route=marketplace">Marketplace</a>
+        <a href="index.php?route=bantuan" style="color: #ffd700; font-weight: bold">Bantuan</a>
       </nav>
       <div class="user-menu">
-        <a href="masuk.php" class="btn-login">Masuk</a>
-        <a href="daftar.php" class="btn-register">Daftar</a>
+        <a href="index.php?route=masuk" class="btn-login">Masuk</a>
+        <a href="index.php?route=daftar" class="btn-register">Daftar</a>
       </div>
     </header>
 
-    <div class="catalog-header">
-      <h2>Pusat Bantuan</h2>
-    </div>
+    <main class="container">
+      <div class="catalog-header">
+        <h2>Pusat Bantuan</h2>
+        <p>Ada kendala atau pertanyaan? Tim kami siap membantu Anda.</p>
+      </div>
 
-    <main class="container help-layout">
-      <div class="faq-section">
-        <h3>Pertanyaan yang Sering Diajukan</h3>
+      <div class="auth-container" style="margin-top: 20px;">
+        <div class="auth-card" style="max-width: 800px;">
+          <h3>Kirim Pesan ke Admin</h3>
+          <form action="index.php" method="GET">
+            <input type="hidden" name="route" value="masuk">
+            <div class="form-group">
+              <label class="form-label">Nama Lengkap</label>
+              <input type="text" name="nama" class="form-control" placeholder="Masukkan nama Anda" required />
+            </div>
 
-        <div class="faq-item">
-          <h4 class="faq-question">Bagaimana cara membeli game di OMNIGAMES?</h4>
-          <p class="faq-answer">
-            Kamu cukup mencari game di halaman Katalog, klik tombol Beli Sekarang, lalu selesaikan proses pembayaran di halaman Marketplace.
-          </p>
+            <div class="form-group">
+              <label class="form-label">Alamat Email</label>
+              <input type="email" name="email" class="form-control" placeholder="Email yang bisa dihubungi" required />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Kategori Kendala</label>
+              <select name="kategori" class="form-control" required>
+                <option value="Akun">Masalah Akun</option>
+                <option value="Pembayaran">Kendala Pembayaran</option>
+                <option value="Game">Masalah Teknis Game</option>
+                <option value="Lainnya">Lainnya</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Pesan</label>
+              <textarea name="pesan" class="form-control" rows="5" placeholder="Jelaskan detail masalah Anda..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn-auth">Kirim Pesan</button>
+          </form>
         </div>
-
-        <div class="faq-item">
-          <h4 class="faq-question">Apakah game yang dibeli bersifat permanen?</h4>
-          <p class="faq-answer">
-            Ya, seluruh game digital yang kamu beli akan tersimpan secara permanen di akun OMNIGAMES milikmu dan bisa diunduh kapan saja.
-          </p>
-        </div>
-        
-        </div>
-
-      <div class="contact-section">
-        <h3>Hubungi Admin</h3>
-        <form action="proses_kontak.php" method="POST">
-          <div class="form-group">
-            <label class="form-label">Nama Lengkap</label>
-            <input type="text" name="nama" class="form-control" placeholder="Masukkan nama kamu" required />
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Alamat Email</label>
-            <input type="email" name="email" class="form-control" placeholder="contoh@email.com" required />
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Kategori Masalah</label>
-            <select name="kategori" class="form-control">
-              <option value="transaksi">Masalah Transaksi</option>
-              <option value="akun">Kendala Akun</option>
-              <option value="teknis">Masalah Teknis Game</option>
-              <option value="lainnya">Pertanyaan Lainnya</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Pesan / Detail Masalah</label>
-            <textarea name="pesan" class="form-control" placeholder="Jelaskan masalah yang kamu alami secara detail..." required></textarea>
-          </div>
-
-          <button type="submit" class="btn-submit">Kirim Pesan</button>
-        </form>
       </div>
     </main>
 

@@ -7,6 +7,6 @@ class HomeController {
 
         $games = $model->getAllGames();
 
-        require_once '../App/views/Beranda.php';
+        require_once 'App/views/Beranda.php';
     }
 }
