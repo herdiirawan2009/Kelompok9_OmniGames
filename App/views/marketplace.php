@@ -53,7 +53,7 @@ $total_bayar = $total_harga + $pajak;
 $jumlah_game = count($cart_items);
 ?>
 <!doctype html>
-<html lang="id">~
+<html lang="id">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -72,8 +72,16 @@ $jumlah_game = count($cart_items);
         <a href="index.php?route=bantuan">Bantuan</a>
       </nav>
       <div class="user-menu">
-        <a href="index.php?route=masuk" class="btn-login">Masuk</a>
-        <a href="index.php?route=daftar" class="btn-register">Daftar</a>
+        <?php if (isset($_SESSION['user_id'])): ?>
+          <?php if ($_SESSION['role'] === 'admin'): ?>
+            <a href="index.php?route=admin_dashboard" class="btn-register" style="background-color: #ffd700; color: #000; font-weight: bold; margin-right: 10px;">Panel Admin</a>
+          <?php endif; ?>
+          <a href="index.php?route=profil" class="btn-register" style="background-color: transparent; color: #ffd700; border: 1px solid #ffd700; font-weight: bold;">Profil Saya</a>
+          <a href="index.php?route=keluar" class="btn-login">Keluar</a>
+        <?php else: ?>
+          <a href="index.php?route=masuk" class="btn-login">Masuk</a>
+          <a href="index.php?route=daftar" class="btn-register">Daftar</a>
+        <?php endif; ?>
       </div>
     </header>
 
@@ -126,8 +134,7 @@ $jumlah_game = count($cart_items);
           <span>Rp <?php echo number_format($total_bayar, 0, ',', '.'); ?></span>
         </div>
 
-        <form action="index.php" method="GET">
-          <input type="hidden" name="route" value="masuk">
+        <form action="index.php?route=proses_checkout" method="POST">
           <div class="payment-method">
             <p>Metode Pembayaran:</p>
             <select name="metode_pembayaran" class="payment-select" required>
@@ -136,8 +143,6 @@ $jumlah_game = count($cart_items);
               <option value="qris">Scan QRIS</option>
             </select>
           </div>
-
-          <input type="hidden" name="total_bayar" value="<?php echo $total_bayar; ?>">
           
           <?php if ($jumlah_game > 0): ?>
             <button type="submit" class="btn-checkout" style="width: 100%; border: none; cursor: pointer;">Bayar Sekarang</button>

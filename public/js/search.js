@@ -35,7 +35,7 @@ function handleSearch() {
     return;
   }
 
-  window.location.href = `katalog?q=${encodeURIComponent(keyword)}`;
+  window.location.href = `index.php?route=katalog&q=${encodeURIComponent(keyword)}`;
 }
 
 document.addEventListener("DOMContentLoaded", () => {

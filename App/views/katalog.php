@@ -1,3 +1,8 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+?>
 <!doctype html>
 <html lang="id">
   <head>
@@ -18,46 +23,58 @@
         <a href="index.php?route=bantuan">Bantuan</a>
       </nav>
       <div class="user-menu">
-        <a href="index.php?route=masuk" class="btn-login">Masuk</a>
-        <a href="index.php?route=daftar" class="btn-register">Daftar</a>
+        <?php if (isset($_SESSION['user_id'])): ?>
+          <?php if ($_SESSION['role'] === 'admin'): ?>
+            <a href="index.php?route=admin_dashboard" class="btn-register" style="background-color: #ffd700; color: #000; font-weight: bold; margin-right: 10px;">Panel Admin</a>
+          <?php endif; ?>
+          <a href="index.php?route=profil" class="btn-register" style="background-color: transparent; color: #ffd700; border: 1px solid #ffd700; font-weight: bold;">Profil Saya</a>
+          <a href="index.php?route=keluar" class="btn-login">Keluar</a>
+        <?php else: ?>
+          <a href="index.php?route=masuk" class="btn-login">Masuk</a>
+          <a href="index.php?route=daftar" class="btn-register">Daftar</a>
+        <?php endif; ?>
       </div>
     </header>
 
     <div class="catalog-header">
       <h2>Semua Game</h2>
-      <div class="catalog-filter">
-        <select class="filter-select">
-          <option value="all">Semua Kategori</option>
-          <option value="rpg">RPG & Adventure</option>
-          <option value="action">Action & Sci-Fi</option>
-          <option value="simulation">Simulation</option>
-          <option value="sports">Sports & Racing</option>
+      <form action="index.php" method="GET" class="catalog-filter">
+        <input type="hidden" name="route" value="katalog">
+        <?php if (!empty($keyword_aktif)): ?>
+            <input type="hidden" name="q" value="<?php echo htmlspecialchars($keyword_aktif); ?>">
+        <?php endif; ?>
+        <select name="kategori" class="filter-select" onchange="this.form.submit()">
+          <option value="all" <?php echo (isset($kategori_aktif) && $kategori_aktif === 'all') ? 'selected' : ''; ?>>Semua Kategori</option>
+          <option value="rpg" <?php echo (isset($kategori_aktif) && strtolower($kategori_aktif) === 'rpg') ? 'selected' : ''; ?>>RPG & Adventure</option>
+          <option value="action" <?php echo (isset($kategori_aktif) && strtolower($kategori_aktif) === 'action') ? 'selected' : ''; ?>>Action & Sci-Fi</option>
+          <option value="simulation" <?php echo (isset($kategori_aktif) && strtolower($kategori_aktif) === 'simulation') ? 'selected' : ''; ?>>Simulation</option>
+          <option value="sports" <?php echo (isset($kategori_aktif) && strtolower($kategori_aktif) === 'sports') ? 'selected' : ''; ?>>Sports & Racing</option>
         </select>
-        <select class="filter-select">
-          <option value="popular">Paling Populer</option>
-          <option value="new">Terbaru</option>
-          <option value="price-low">Harga Terendah</option>
-          <option value="price-high">Harga Tertinggi</option>
+        <select name="urut" class="filter-select" onchange="this.form.submit()">
+          <option value="popular" <?php echo (isset($urut_aktif) && $urut_aktif === 'popular') ? 'selected' : ''; ?>>Paling Populer</option>
+          <option value="new" <?php echo (isset($urut_aktif) && $urut_aktif === 'new') ? 'selected' : ''; ?>>Terbaru</option>
+          <option value="price-low" <?php echo (isset($urut_aktif) && $urut_aktif === 'price-low') ? 'selected' : ''; ?>>Harga Terendah</option>
+          <option value="price-high" <?php echo (isset($urut_aktif) && $urut_aktif === 'price-high') ? 'selected' : ''; ?>>Harga Tertinggi</option>
         </select>
-      </div>
+      </form>
     </div>
 
     <main class="container">
       <div class="game-grid">
-        <?php if ($result && $result->num_rows > 0): ?>
+        <?php if (isset($result) && $result->num_rows > 0): ?>
           <?php while($row = $result->fetch_assoc()): ?>
             <div class="game-card">
               <img
-                src="public/Image/<?php echo $row['gambar']; ?>"
-                alt="<?php echo $row['judul']; ?>"
+                src="public/Image/<?php echo htmlspecialchars($row['gambar']); ?>"
+                alt="<?php echo htmlspecialchars($row['judul']); ?>"
                 class="game-img"
               />
               <div class="game-body">
-                <h4><?php echo $row['judul']; ?></h4>
-                <p class="genre"><?php echo $row['genre']; ?></p>
-                <p class="specs"><?php echo $row['spesifikasi']; ?></p>
+                <h4><?php echo htmlspecialchars($row['judul']); ?></h4>
+                <p class="genre"><?php echo htmlspecialchars($row['genre']); ?></p>
+                <p class="specs"><?php echo htmlspecialchars($row['spesifikasi']); ?></p>
                 <div class="rating-price">
-                  <span class="rating">⭐ <?php echo $row['rating']; ?></span>
+                  <span class="rating">⭐ <?php echo htmlspecialchars($row['rating']); ?></span>
                   <span class="price">Rp <?php echo number_format($row['harga'], 0, ',', '.'); ?></span>
                 </div>
               </div>
@@ -68,7 +85,7 @@
             </div>
           <?php endwhile; ?>
         <?php else: ?>
-          <p>Belum ada game yang tersedia di katalog.</p>
+          <p id="empty-search-message" style="text-align: center; width: 100%; grid-column: 1 / -1; padding: 40px 0;">Belum ada game yang sesuai dengan filter atau pencarian.</p>
         <?php endif; ?>
       </div>
 
@@ -89,5 +106,6 @@
         <p>&copy; <?php echo date('Y'); ?> OMNIGAMES Project. All rights reserved.</p>
       </div>
     </footer>
+    <script src="public/js/search.js"></script>
   </body>
 </html>

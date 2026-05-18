@@ -18,8 +18,16 @@
         <a href="index.php?route=bantuan" style="color: #ffd700; font-weight: bold">Bantuan</a>
       </nav>
       <div class="user-menu">
-        <a href="index.php?route=masuk" class="btn-login">Masuk</a>
-        <a href="index.php?route=daftar" class="btn-register">Daftar</a>
+        <?php if (isset($_SESSION['user_id'])): ?>
+          <?php if ($_SESSION['role'] === 'admin'): ?>
+            <a href="index.php?route=admin_dashboard" class="btn-register" style="background-color: #ffd700; color: #000; font-weight: bold; margin-right: 10px;">Panel Admin</a>
+          <?php endif; ?>
+          <a href="index.php?route=profil" class="btn-register" style="background-color: transparent; color: #ffd700; border: 1px solid #ffd700; font-weight: bold;">Profil Saya</a>
+          <a href="index.php?route=keluar" class="btn-login">Keluar</a>
+        <?php else: ?>
+          <a href="index.php?route=masuk" class="btn-login">Masuk</a>
+          <a href="index.php?route=daftar" class="btn-register">Daftar</a>
+        <?php endif; ?>
       </div>
     </header>
 

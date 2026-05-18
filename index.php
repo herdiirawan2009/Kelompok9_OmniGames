@@ -38,22 +38,25 @@ if (
     exit;
 }
 
-function view($path, $data = []) {
-    extract($data); 
-    $filePath = VIEWS_PATH . $path;
+if (!function_exists('view')) {
+    function view($path, $data = []) {
+        extract($data); 
+        $filePath = VIEWS_PATH . $path;
 
-    if (file_exists($filePath)) {
-        require $filePath;
-    } else {
-        http_response_code(404);
-        echo "<h1>404 Not Found</h1>";
-        echo "File tampilan tidak ditemukan di: " . htmlspecialchars($filePath);
+        if (file_exists($filePath)) {
+            require $filePath;
+        } else {
+            http_response_code(404);
+            echo "<h1>404 Not Found</h1>";
+            echo "File tampilan tidak ditemukan di: " . htmlspecialchars($filePath);
+        }
     }
 }
 
 $database = new Database();
 $db = $database->getConnection();
 $gameModel = new Game_model($db);
+$bantuanModel = new Bantuan_model($db);
 
 switch ($route) {
     case '/':
@@ -75,12 +78,84 @@ switch ($route) {
             'resultUlasan' => $resultUlasan
         ]);
         break;
+    case '/proses_ulasan':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $game_id = isset($_POST['game_id']) ? intval($_POST['game_id']) : 0;
+            if (!isset($_SESSION['user_id'])) {
+                echo "<script>alert('Silakan masuk ke akun terlebih dahulu untuk memberikan ulasan'); window.location.href='index.php?route=detail&id={$game_id}';</script>";
+                exit;
+            }
+            $nama_user = isset($_SESSION['nama_lengkap']) ? $_SESSION['nama_lengkap'] : 'Pengguna';
+            $rating = isset($_POST['rating_user']) ? intval($_POST['rating_user']) : 0;
+            $komentar = isset($_POST['komentar']) ? $_POST['komentar'] : '';
+            if ($gameModel->tambahUlasan($game_id, $nama_user, $rating, $komentar)) {
+                echo "<script>window.location.href='index.php?route=detail&id={$game_id}';</script>";
+            } else {
+                echo "<script>alert('Gagal menyimpan ulasan'); window.location.href='index.php?route=detail&id={$game_id}';</script>";
+            }
+        }
+        break;
     case '/katalog':
-        $result = $gameModel->getAllGames();
-        view('katalog.php', ['result' => $result]);
+        $kategori = isset($_GET['kategori']) ? $_GET['kategori'] : 'all';
+        $urut = isset($_GET['urut']) ? $_GET['urut'] : 'popular';
+        $keyword = isset($_GET['q']) ? $_GET['q'] : '';
+        
+        $result = $gameModel->getAllGames($kategori, $urut, $keyword);
+        view('katalog.php', [
+            'result' => $result,
+            'kategori_aktif' => $kategori,
+            'urut_aktif' => $urut,
+            'keyword_aktif' => $keyword
+        ]);
         break;
     case '/marketplace':
         view('marketplace.php', ['db' => $db]);
+        break;
+    case '/proses_checkout':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!isset($_SESSION['user_id'])) {
+                header('Location: index.php?route=masuk');
+                exit;
+            }
+            $user_id = intval($_SESSION['user_id']);
+            $metode_pembayaran = isset($_POST['metode_pembayaran']) ? $db->real_escape_string($_POST['metode_pembayaran']) : '';
+            $total_harga = 0;
+            if (!empty($_SESSION['cart'])) {
+                $ids = implode(',', array_map('intval', $_SESSION['cart']));
+                $query = "SELECT harga, id FROM games WHERE id IN ($ids)";
+                $result = $db->query($query);
+                if ($result && $result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                        $total_harga += intval($row['harga']);
+                    }
+                }
+            }
+            $pajak = round($total_harga * 0.11);
+            $total_bayar = $total_harga + $pajak;
+            $status_pembayaran = 'Lunas';
+            $stmt = $db->prepare("INSERT INTO transaksi (user_id, total_bayar, metode_pembayaran, status_pembayaran, tanggal_transaksi) VALUES (?, ?, ?, ?, NOW())");
+            if ($stmt) {
+                $stmt->bind_param('iiss', $user_id, $total_bayar, $metode_pembayaran, $status_pembayaran);
+                if ($stmt->execute()) {
+                    $transaksi_id = $db->insert_id;
+                    if (!empty($_SESSION['cart'])) {
+                        $detail_stmt = $db->prepare("INSERT INTO detail_transaksi (transaksi_id, game_id) VALUES (?, ?)");
+                        if ($detail_stmt) {
+                            foreach ($_SESSION['cart'] as $game_id) {
+                                $game_id = intval($game_id);
+                                $detail_stmt->bind_param('ii', $transaksi_id, $game_id);
+                                $detail_stmt->execute();
+                            }
+                        }
+                    }
+                    $_SESSION['cart'] = array();
+                    echo "<script>alert('Pembayaran berhasil diproses! Terima kasih telah berbelanja.'); window.location.href='index.php?route=profil';</script>";
+                    exit;
+                }
+            }
+            echo "<script>alert('Gagal memproses pembayaran'); window.location.href='index.php?route=marketplace';</script>";
+            exit;
+        }
         break;
     case '/bantuan':
         view('bantuan.php', ['db' => $db]);
@@ -90,6 +165,188 @@ switch ($route) {
         break;
     case '/daftar':
         view('daftar.php');
+        break;
+    case '/profil':
+        if (!isset($_SESSION['user_id'])) {
+            header("Location: index.php?route=masuk");
+            exit;
+        }
+        view('profil.php');
+        break;
+    case '/admin_dashboard':
+        if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+            header("Location: index.php?route=masuk");
+            exit;
+        }
+        view('admin_dashboard.php');
+        break;
+    case '/admin_games':
+        if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+            header("Location: index.php?route=masuk");
+            exit;
+        }
+        $result = $gameModel->getAllGames();
+        view('admin_games.php', ['result' => $result]);
+        break;
+    case '/admin_tambah_game':
+        if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+            header("Location: index.php?route=masuk");
+            exit;
+        }
+        view('admin_form_game.php', ['action' => 'proses_tambah_game']);
+        break;
+    case '/admin_edit_game':
+        if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+            header("Location: index.php?route=masuk");
+            exit;
+        }
+        $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+        $game = $gameModel->getGameById($id);
+        view('admin_form_game.php', ['action' => 'proses_edit_game', 'game' => $game]);
+        break;
+    case '/proses_tambah_game':
+        if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+            header("Location: index.php?route=masuk");
+            exit;
+        }
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if ($gameModel->tambahGame($_POST, $_FILES['gambar'])) {
+                echo "<script>alert('Game berhasil ditambahkan'); window.location.href='index.php?route=admin_games';</script>";
+            } else {
+                echo "<script>alert('Gagal menambahkan game'); window.location.href='index.php?route=admin_tambah_game';</script>";
+            }
+        }
+        break;
+    case '/proses_edit_game':
+        if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+            header("Location: index.php?route=masuk");
+            exit;
+        }
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+            if ($gameModel->editGame($id, $_POST, $_FILES['gambar'])) {
+                echo "<script>alert('Game berhasil diubah'); window.location.href='index.php?route=admin_games';</script>";
+            } else {
+                echo "<script>alert('Gagal mengubah game'); window.location.href='index.php?route=admin_edit_game&id={$id}';</script>";
+            }
+        }
+        break;
+    case '/admin_hapus_game':
+        if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+            header("Location: index.php?route=masuk");
+            exit;
+        }
+        $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+        if ($gameModel->hapusGame($id)) {
+            echo "<script>alert('Game berhasil dihapus'); window.location.href='index.php?route=admin_games';</script>";
+        } else {
+            echo "<script>alert('Gagal menghapus game'); window.location.href='index.php?route=admin_games';</script>";
+        }
+        break;
+    case '/admin_pesan':
+        if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+            header("Location: index.php?route=masuk");
+            exit;
+        }
+        $result = $bantuanModel->getAllPesan();
+        view('admin_pesan.php', ['result' => $result]);
+        break;
+    case '/admin_transaksi':
+        if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+            header("Location: index.php?route=masuk");
+            exit;
+        }
+        view('admin_transaksi.php');
+        break;
+    case '/proses_bantuan':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = [
+                'nama' => $_POST['nama'],
+                'email' => $_POST['email'],
+                'kategori' => $_POST['kategori'],
+                'pesan' => $_POST['pesan']
+            ];
+            
+            if ($bantuanModel->kirimPesan($data)) {
+                echo "<script>alert('Pesan bantuan berhasil dikirim!'); window.location.href='index.php?route=bantuan';</script>";
+            } else {
+                echo "<script>alert('Gagal mengirim pesan bantuan!'); window.location.href='index.php?route=bantuan';</script>";
+            }
+        }
+        break;
+    case '/proses_daftar':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $nama = $_POST['nama_lengkap'];
+            $email = $_POST['email'];
+            $password = $_POST['password'];
+            $confirm_password = $_POST['confirm_password'];
+            $role = $_POST['role'];
+
+            if ($password !== $confirm_password) {
+                echo "<script>alert('Konfirmasi password tidak cocok!'); window.location.href='index.php?route=daftar';</script>";
+                exit;
+            }
+
+            $parts = explode('@', $email);
+            $username = $parts[0];
+
+            $stmt_check = $db->prepare("SELECT id FROM users WHERE email = ? OR username = ?");
+            $stmt_check->bind_param("ss", $email, $username);
+            $stmt_check->execute();
+            $result_check = $stmt_check->get_result();
+
+            if ($result_check->num_rows > 0) {
+                echo "<script>alert('Email atau Username sudah terdaftar!'); window.location.href='index.php?route=daftar';</script>";
+                exit;
+            }
+
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+            $stmt = $db->prepare("INSERT INTO users (nama_lengkap, username, email, password, role) VALUES (?, ?, ?, ?, ?)");
+            $stmt->bind_param("sssss", $nama, $username, $email, $hashed_password, $role);
+            
+            if ($stmt->execute()) {
+                echo "<script>alert('Pendaftaran berhasil! Silakan masuk.'); window.location.href='index.php?route=masuk';</script>";
+            } else {
+                echo "<script>alert('Gagal mendaftar!'); window.location.href='index.php?route=daftar';</script>";
+            }
+        }
+        break;
+    case '/proses_masuk':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $login_input = trim($_POST['username']);
+            $password = trim($_POST['password']);
+
+            $stmt = $db->prepare("SELECT * FROM users WHERE email = ? OR username = ?");
+            $stmt->bind_param("ss", $login_input, $login_input);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result->num_rows === 1) {
+                $user = $result->fetch_assoc();
+                if (password_verify($password, $user['password'])) {
+                    $_SESSION['user_id'] = $user['id'];
+                    $_SESSION['nama_lengkap'] = $user['nama_lengkap'];
+                    $_SESSION['username'] = $user['username'];
+                    $_SESSION['email'] = $user['email'];
+                    $_SESSION['role'] = $user['role'];
+
+                    if ($user['role'] === 'admin') {
+                        header("Location: index.php?route=admin_dashboard");
+                    } else {
+                        header("Location: index.php");
+                    }
+                    exit;
+                }
+            }
+            $_SESSION['error_login'] = "Email atau password salah!";
+            header("Location: index.php?route=masuk");
+            exit;
+        }
+        break;
+    case '/keluar':
+        session_destroy();
+        header("Location: index.php");
+        exit;
         break;
     default:
         http_response_code(404);

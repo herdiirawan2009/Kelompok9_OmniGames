@@ -1,13 +1,3 @@
-<?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-if (isset($_SESSION['user_id'])) {
-    header("Location: index.php");
-    exit;
-}
-?>
 <!doctype html>
 <html lang="id">
   <head>
@@ -50,7 +40,7 @@ if (isset($_SESSION['user_id'])) {
             </div>
         <?php endif; ?>
 
-        <form action="proses_masuk.php" method="POST">
+        <form action="index.php?route=proses_masuk" method="POST">
           <div class="form-group">
             <label class="form-label">Email atau Username</label>
             <input
