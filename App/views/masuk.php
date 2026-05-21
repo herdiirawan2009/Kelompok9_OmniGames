@@ -31,6 +31,14 @@
       <div class="auth-card">
         <h2>Masuk ke Akun</h2>
 
+        <?php if(isset($_SESSION['success_forgot'])): ?>
+            <div style="color: #000000; background: #ffd700; padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center;">
+                <?php 
+                    echo $_SESSION['success_forgot']; 
+                    unset($_SESSION['success_forgot']); 
+                ?>
+            </div>
+        <?php endif; ?>
         <?php if(isset($_SESSION['error_login'])): ?>
             <div style="color: #ff4d4d; background: rgba(255, 77, 77, 0.1); padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center;">
                 <?php 
@@ -54,24 +62,44 @@
 
           <div class="form-group">
             <label class="form-label">Password</label>
-            <input
-              type="password"
-              name="password"
-              class="form-control"
-              placeholder="Masukkan password"
-              required
-            />
+            <div class="password-field">
+              <input
+                type="password"
+                name="password"
+                id="password"
+                class="form-control"
+                placeholder="Masukkan password"
+                required
+              />
+              <button type="button" class="password-toggle" data-target="password">👁</button>
+            </div>
           </div>
 
           <button type="submit" class="btn-auth">Masuk</button>
         </form>
 
         <div class="auth-links">
-          <a href="javascript:alert('Fitur reset password akan segera hadir!')">Lupa Password?</a>
+          <a href="index.php?route=lupa_password">Lupa Password?</a>
           <p>Belum punya akun? <a href="index.php?route=daftar">Daftar sekarang</a></p>
         </div>
       </div>
     </main>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.password-toggle').forEach(function(button) {
+          button.addEventListener('click', function() {
+            var target = document.getElementById(button.dataset.target);
+            if (!target) return;
+            if (target.type === 'password') {
+              target.type = 'text';
+            } else {
+              target.type = 'password';
+            }
+          });
+        });
+      });
+    </script>
 
     <footer class="footer">
       <div class="footer-content">

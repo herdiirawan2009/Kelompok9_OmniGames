@@ -311,6 +311,45 @@ switch ($route) {
             }
         }
         break;
+    case '/lupa_password':
+        view('lupa_password.php');
+        break;
+    case '/proses_lupa_password':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $email = isset($_POST['email']) ? trim($_POST['email']) : '';
+            $password = isset($_POST['password']) ? $_POST['password'] : '';
+            $confirm_password = isset($_POST['confirm_password']) ? $_POST['confirm_password'] : '';
+
+            if ($password !== $confirm_password) {
+                $_SESSION['error_forgot'] = "Konfirmasi password tidak cocok!";
+                header("Location: index.php?route=lupa_password");
+                exit;
+            }
+
+            $stmt = $db->prepare("SELECT id FROM users WHERE email = ?");
+            $stmt->bind_param("s", $email);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result && $result->num_rows === 1) {
+                $user = $result->fetch_assoc();
+                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+                $updateStmt = $db->prepare("UPDATE users SET password = ? WHERE id = ?");
+                if ($updateStmt) {
+                    $updateStmt->bind_param('si', $hashed_password, $user['id']);
+                    if ($updateStmt->execute()) {
+                        $_SESSION['success_forgot'] = "Password berhasil direset. Silakan login dengan password baru.";
+                        header("Location: index.php?route=masuk");
+                        exit;
+                    }
+                }
+            }
+
+            $_SESSION['error_forgot'] = "Email tidak ditemukan.";
+            header("Location: index.php?route=lupa_password");
+            exit;
+        }
+        break;
     case '/proses_masuk':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $login_input = trim($_POST['username']);
@@ -321,9 +360,24 @@ switch ($route) {
             $stmt->execute();
             $result = $stmt->get_result();
 
-            if ($result->num_rows === 1) {
+            if ($result && $result->num_rows === 1) {
                 $user = $result->fetch_assoc();
-                if (password_verify($password, $user['password'])) {
+                $storedPassword = $user['password'];
+                $validPassword = false;
+
+                if (password_verify($password, $storedPassword)) {
+                    $validPassword = true;
+                } elseif ($password === $storedPassword) {
+                    $validPassword = true;
+                    $newHash = password_hash($password, PASSWORD_DEFAULT);
+                    $updateStmt = $db->prepare("UPDATE users SET password = ? WHERE id = ?");
+                    if ($updateStmt) {
+                        $updateStmt->bind_param('si', $newHash, $user['id']);
+                        $updateStmt->execute();
+                    }
+                }
+
+                if ($validPassword) {
                     $_SESSION['user_id'] = $user['id'];
                     $_SESSION['nama_lengkap'] = $user['nama_lengkap'];
                     $_SESSION['username'] = $user['username'];
@@ -338,6 +392,7 @@ switch ($route) {
                     exit;
                 }
             }
+
             $_SESSION['error_login'] = "Email atau password salah!";
             header("Location: index.php?route=masuk");
             exit;
