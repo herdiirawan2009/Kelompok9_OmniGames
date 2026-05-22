@@ -16,7 +16,7 @@ require_once MODELS_PATH . 'Game_model.php';
 require_once MODELS_PATH . 'Bantuan_model.php';
 
 $requestUri = urldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
-$projectFolder = '/Kelompok9_OmniGames'; 
+$projectFolder = '/omnigames'; 
 
 $route = str_replace($projectFolder, '', $requestUri); 
 $route = str_replace('//', '/', $route); 
@@ -397,6 +397,61 @@ switch ($route) {
             header("Location: index.php?route=masuk");
             exit;
         }
+        break;
+    case '/developer_dashboard':
+        if (!isset($_SESSION['user_id'])) { header("Location: index.php?route=masuk"); exit; }
+        require_once VIEWS_PATH . 'developer_dashboard.php';
+        break;
+
+    case '/developer_games':
+        if (!isset($_SESSION['user_id'])) { header("Location: index.php?route=masuk"); exit; }
+        $gameModel = new Game_model((new Database())->getConnection());
+        $games = $gameModel->getGamesByDeveloper($_SESSION['user_id']);
+        require_once VIEWS_PATH . 'developer_games.php';
+        break;
+
+    case '/developer_tambah_game':
+        if (!isset($_SESSION['user_id'])) { header("Location: index.php?route=masuk"); exit; }
+        $action = 'proses_developer_tambah_game';
+        require_once VIEWS_PATH . 'developer_form_game.php';
+        break;
+
+    case '/proses_developer_tambah_game':
+        if (!isset($_SESSION['user_id'])) { header("Location: index.php?route=masuk"); exit; }
+        $gameModel = new Game_model((new Database())->getConnection());
+        $gameModel->tambahGameDeveloper($_POST, $_FILES['gambar'] ?? null, $_SESSION['user_id']);
+        header("Location: index.php?route=developer_games");
+        exit;
+        break;
+
+    case '/developer_edit_game':
+        if (!isset($_SESSION['user_id']) || !isset($_GET['id'])) { header("Location: index.php?route=masuk"); exit; }
+        $gameModel = new Game_model((new Database())->getConnection());
+        $game = $gameModel->getGameById($_GET['id']);
+        // Keamanan ganda: Hanya pemilik game yang bisa mengedit
+        if ($game && $game['developer_id'] == $_SESSION['user_id']) {
+            $action = 'proses_developer_edit_game&id=' . intval($_GET['id']);
+            require_once VIEWS_PATH . 'developer_form_game.php';
+        } else {
+            header("Location: index.php?route=developer_games");
+            exit;
+        }
+        break;
+
+    case '/proses_developer_edit_game':
+        if (!isset($_SESSION['user_id']) || !isset($_GET['id'])) { header("Location: index.php?route=masuk"); exit; }
+        $gameModel = new Game_model((new Database())->getConnection());
+        $gameModel->updateGameDeveloper($_POST, $_FILES['gambar'] ?? null, $_GET['id'], $_SESSION['user_id']);
+        header("Location: index.php?route=developer_games");
+        exit;
+        break;
+
+    case '/developer_hapus_game':
+        if (!isset($_SESSION['user_id']) || !isset($_GET['id'])) { header("Location: index.php?route=masuk"); exit; }
+        $gameModel = new Game_model((new Database())->getConnection());
+        $gameModel->hapusGameDeveloper($_GET['id'], $_SESSION['user_id']);
+        header("Location: index.php?route=developer_games");
+        exit;
         break;
     case '/keluar':
         session_destroy();
