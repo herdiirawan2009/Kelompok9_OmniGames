@@ -122,5 +122,69 @@ class Game_model {
         $stmt->bind_param('i', $id);
         return $stmt->execute();
     }
+
+    public function getGamesByDeveloper($developer_id) {
+        $dev_id = intval($developer_id);
+        $query = "SELECT * FROM games WHERE developer_id = $dev_id ORDER BY id DESC";
+        return $this->conn->query($query);
+    }
+
+    public function tambahGameDeveloper($data, $file, $developer_id) {
+        $judul = $this->conn->real_escape_string($data['judul']);
+        $genre = $this->conn->real_escape_string($data['genre']);
+        $harga = intval($data['harga']);
+        $spesifikasi = $this->conn->real_escape_string($data['spesifikasi']);
+        $deskripsi = $this->conn->real_escape_string($data['deskripsi']);
+        $rating = 0;
+
+        $gambar = '';
+        if ($file && isset($file['tmp_name']) && $file['tmp_name'] !== '' && $file['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = __DIR__ . '/../../public/Image/';
+            $gambar = time() . '_' . basename($file['name']);
+            move_uploaded_file($file['tmp_name'], $uploadDir . $gambar);
+        }
+
+        $query = "INSERT INTO games (developer_id, judul, genre, harga, rating, spesifikasi, deskripsi, gambar) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param('issidsss', $developer_id, $judul, $genre, $harga, $rating, $spesifikasi, $deskripsi, $gambar);
+        return $stmt->execute();
+    }
+
+    public function updateGameDeveloper($data, $file, $id, $developer_id) {
+        $id = intval($id);
+        $dev_id = intval($developer_id);
+        $judul = $this->conn->real_escape_string($data['judul']);
+        $genre = $this->conn->real_escape_string($data['genre']);
+        $harga = intval($data['harga']);
+        $spesifikasi = $this->conn->real_escape_string($data['spesifikasi']);
+        $deskripsi = $this->conn->real_escape_string($data['deskripsi']);
+
+        $gambar = '';
+        if ($file && isset($file['tmp_name']) && $file['tmp_name'] !== '' && $file['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = __DIR__ . '/../../public/Image/';
+            $gambar = time() . '_' . basename($file['name']);
+            move_uploaded_file($file['tmp_name'], $uploadDir . $gambar);
+        }
+
+        if ($gambar !== '') {
+            $query = "UPDATE games SET judul = ?, genre = ?, harga = ?, spesifikasi = ?, deskripsi = ?, gambar = ? WHERE id = ? AND developer_id = ?";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bind_param('ssisssii', $judul, $genre, $harga, $spesifikasi, $deskripsi, $gambar, $id, $dev_id);
+        } else {
+            $query = "UPDATE games SET judul = ?, genre = ?, harga = ?, spesifikasi = ?, deskripsi = ? WHERE id = ? AND developer_id = ?";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bind_param('ssissii', $judul, $genre, $harga, $spesifikasi, $deskripsi, $id, $dev_id);
+        }
+        return $stmt->execute();
+    }
+
+    public function hapusGameDeveloper($id, $developer_id) {
+        $id = intval($id);
+        $dev_id = intval($developer_id);
+        $query = "DELETE FROM games WHERE id = ? AND developer_id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param('ii', $id, $dev_id);
+        return $stmt->execute();
+    }
 }
 ?>
