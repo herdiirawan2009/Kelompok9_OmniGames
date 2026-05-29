@@ -16,7 +16,7 @@ require_once MODELS_PATH . 'Game_model.php';
 require_once MODELS_PATH . 'Bantuan_model.php';
 
 $requestUri = urldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
-$projectFolder = '/omnigames'; 
+$projectFolder = '/' . basename(BASE_PATH); 
 
 $route = str_replace($projectFolder, '', $requestUri); 
 $route = str_replace('//', '/', $route); 
@@ -171,7 +171,41 @@ switch ($route) {
             header("Location: index.php?route=masuk");
             exit;
         }
-        view('profil.php');
+        view('profil.php', ['foto_profil' => isset($_SESSION['foto_profil']) ? $_SESSION['foto_profil'] : '']);
+        break;
+    case '/upload_foto':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!isset($_SESSION['user_id'])) {
+                header('Location: index.php?route=masuk');
+                exit;
+            }
+
+            if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
+                $uploadDir = BASE_PATH . '/public/Image/';
+                $tmpName = $_FILES['foto']['tmp_name'];
+                $originalName = basename($_FILES['foto']['name']);
+                $ext = pathinfo($originalName, PATHINFO_EXTENSION);
+                $allowed = ['jpg','jpeg','png','gif','webp'];
+                $extLower = strtolower($ext);
+                if (!in_array($extLower, $allowed)) {
+                    header('Location: index.php?route=profil');
+                    exit;
+                }
+                $newName = time() . '_' . bin2hex(random_bytes(5)) . '.' . $extLower;
+                $targetPath = $uploadDir . $newName;
+                if (move_uploaded_file($tmpName, $targetPath)) {
+                    $userId = intval($_SESSION['user_id']);
+                    $stmt = $db->prepare("UPDATE users SET foto_profil = ? WHERE id = ?");
+                    if ($stmt) {
+                        $stmt->bind_param('si', $newName, $userId);
+                        $stmt->execute();
+                    }
+                    $_SESSION['foto_profil'] = $newName;
+                }
+            }
+            header('Location: index.php?route=profil');
+            exit;
+        }
         break;
     case '/admin_dashboard':
         if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {

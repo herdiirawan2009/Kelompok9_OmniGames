@@ -18,8 +18,14 @@
         <a href="index.php?route=bantuan">Bantuan</a>
       </nav>
       <div class="user-menu">
-        <a href="index.php?route=masuk" class="btn-login">Masuk</a>
-        <a href="index.php?route=daftar" class="btn-register">Daftar</a>
+        <?php if (isset($_SESSION['user_id'])): ?>
+          <a href="index.php?route=profil" style="display:inline-block;">
+            <img src="public/Image/<?php echo !empty($_SESSION['foto_profil']) ? htmlspecialchars($_SESSION['foto_profil']) : 'default_avatar.png'; ?>" alt="Profil" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid #ffd700;" />
+          </a>
+        <?php else: ?>
+          <a href="index.php?route=masuk" class="btn-login">Masuk</a>
+          <a href="index.php?route=daftar" class="btn-register">Daftar</a>
+        <?php endif; ?>
       </div>
     </header>
 

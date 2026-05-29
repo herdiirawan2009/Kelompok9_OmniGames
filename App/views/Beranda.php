@@ -27,8 +27,9 @@ if (session_status() === PHP_SESSION_NONE) {
           <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
             <a href="index.php?route=admin_dashboard" class="btn-register" style="background-color: #ffd700; color: #000; font-weight: bold; margin-right: 10px;">Panel Admin</a>
           <?php endif; ?>
-          <a href="index.php?route=profil" class="btn-register" style="background-color: transparent; color: #ffd700; border: 1px solid #ffd700; font-weight: bold;">Profil Saya</a>
-          <a href="index.php?route=keluar" class="btn-login">Keluar</a>
+          <a href="index.php?route=profil" style="display:inline-block;">
+            <img src="public/Image/<?php echo !empty($_SESSION['foto_profil']) ? htmlspecialchars($_SESSION['foto_profil']) : 'default_avatar.png'; ?>" alt="Profil" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid #ffd700;" />
+          </a>
         <?php else: ?>
           <a href="index.php?route=masuk" class="btn-login">Masuk</a>
           <a href="index.php?route=daftar" class="btn-register">Daftar</a>
@@ -40,6 +41,7 @@ if (session_status() === PHP_SESSION_NONE) {
       <h2>Satu Platform Untuk Semua Kebutuhan Gaming Anda</h2>
       <p>Temukan spesifikasi lengkap, baca ulasan jujur, dan beli game original dengan aman.</p>
       <div class="search-box">
+        
         <input type="text" id="searchInput" placeholder="Cari judul game atau genre..." />
         <button id="searchButton" class="btn-search">Cari</button>
       </div>

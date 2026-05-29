@@ -16,7 +16,10 @@
         <a href="index.php?route=developer_games">Daftar Game Saya</a>
       </nav>
       <div class="user-menu">
-        <span style="color: #ffffff; margin-right: 15px;">Developer: <?php echo htmlspecialchars($_SESSION['nama_lengkap']); ?></span>
+        <span style="color: #ffffff; margin-right: 10px;">Developer: <?php echo htmlspecialchars($_SESSION['nama_lengkap']); ?></span>
+        <a href="index.php?route=profil" style="display:inline-block;">
+          <img src="public/Image/<?php echo !empty($_SESSION['foto_profil']) ? htmlspecialchars($_SESSION['foto_profil']) : 'default_avatar.png'; ?>" alt="Profil" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid #ffd700;" />
+        </a>
       </div>
     </header>
 
