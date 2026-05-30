@@ -3,6 +3,19 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+if (isset($_SESSION['user_id'])) {
+    $waktu_timeout = 300;
+    if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $waktu_timeout) {
+        session_unset();
+        session_destroy();
+        session_start();
+        $_SESSION['error_login'] = "Sesi Anda telah berakhir karena tidak ada aktivitas selama 5 menit. Silakan masuk kembali.";
+        header("Location: index.php?route=masuk");
+        exit;
+    }
+    $_SESSION['last_activity'] = time();
+}
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
