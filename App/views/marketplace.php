@@ -138,11 +138,58 @@ $jumlah_game = count($cart_items);
         <form action="index.php?route=proses_checkout" method="POST">
           <div class="payment-method">
             <p>Metode Pembayaran:</p>
-            <select name="metode_pembayaran" class="payment-select" required>
+            <select id="metodePembayaran" name="metode_pembayaran" class="payment-select" required>
               <option value="transfer">Transfer Bank (BCA/Mandiri)</option>
               <option value="ewallet">E-Wallet (GoPay/OVO/Dana)</option>
               <option value="qris">Scan QRIS</option>
             </select>
+          </div>
+
+          <div id="paymentDetails">
+            <div class="payment-detail payment-transfer">
+              <div class="form-group">
+                <label for="bank_tujuan">Bank Tujuan</label>
+                <select name="bank_tujuan" id="bank_tujuan" class="payment-select">
+                  <option value="BCA">BCA</option>
+                  <option value="Mandiri">Mandiri</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="nomor_rekening">No. Rekening Tujuan</label>
+                <input type="text" id="nomor_rekening" name="nomor_rekening" class="payment-input" value="1234567890" readonly />
+              </div>
+            </div>
+
+            <div class="payment-detail payment-ewallet" style="display: none;">
+              <div class="form-group">
+                <label for="ewallet_provider">Pilih E-Wallet</label>
+                <select name="ewallet_provider" id="ewallet_provider" class="payment-select" disabled>
+                  <option value="GoPay">GoPay</option>
+                  <option value="OVO">OVO</option>
+                  <option value="Dana">Dana</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="ewallet_number">Nomor/ID E-Wallet</label>
+                <input type="text" id="ewallet_number" name="ewallet_number" class="payment-input" placeholder="Masukkan nomor/ID e-wallet Anda" disabled />
+              </div>
+            </div>
+
+            <div class="payment-detail payment-qris" style="display: none;">
+              <p style="color: #cccccc; margin-bottom: 12px;">Silakan scan QRIS berikut untuk menyelesaikan pembayaran:</p>
+              <div class="qris-code">
+                <div class="qris-block"></div>
+                <div class="qris-block"></div>
+                <div class="qris-block"></div>
+                <div class="qris-block"></div>
+                <div class="qris-block"></div>
+                <div class="qris-block"></div>
+                <div class="qris-block"></div>
+                <div class="qris-block"></div>
+                <div class="qris-block"></div>
+              </div>
+              <input type="hidden" name="qris_code" value="QRIS-OMNIGAMES-2026" />
+            </div>
           </div>
           
           <?php if ($jumlah_game > 0): ?>
@@ -163,5 +210,27 @@ $jumlah_game = count($cart_items);
         <p>&copy; <?php echo date('Y'); ?> OMNIGAMES Project. All rights reserved.</p>
       </div>
     </footer>
+      <script>
+        (function() {
+          const metodeSelect = document.getElementById('metodePembayaran');
+          const transferSection = document.querySelector('.payment-transfer');
+          const ewalletSection = document.querySelector('.payment-ewallet');
+          const qrisSection = document.querySelector('.payment-qris');
+          const ewalletProvider = document.getElementById('ewallet_provider');
+          const ewalletNumber = document.getElementById('ewallet_number');
+
+          function updatePaymentDetails() {
+            const metode = metodeSelect.value;
+            transferSection.style.display = metode === 'transfer' ? 'block' : 'none';
+            ewalletSection.style.display = metode === 'ewallet' ? 'block' : 'none';
+            qrisSection.style.display = metode === 'qris' ? 'block' : 'none';
+            ewalletProvider.disabled = metode !== 'ewallet';
+            ewalletNumber.disabled = metode !== 'ewallet';
+          }
+
+          metodeSelect.addEventListener('change', updatePaymentDetails);
+          updatePaymentDetails();
+        })();
+      </script>
   </body>
 </html>

@@ -100,12 +100,34 @@ switch ($route) {
         $urut = isset($_GET['urut']) ? $_GET['urut'] : 'popular';
         $keyword = isset($_GET['q']) ? $_GET['q'] : '';
         
-        $result = $gameModel->getAllGames($kategori, $urut, $keyword);
+        $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+        $perPage = 4;
+
+        // adjust perPage down until we have at least 3 pages (if database has enough items)
+        $paged = $gameModel->getGamesPaged($kategori, $urut, $keyword, $page, $perPage);
+        $total_pages = $paged['total_pages'];
+        while ($total_pages < 3 && $perPage > 1) {
+            $perPage = max(1, (int) floor($perPage / 2));
+            $paged = $gameModel->getGamesPaged($kategori, $urut, $keyword, $page, $perPage);
+            $total_pages = $paged['total_pages'];
+        }
+
+        // ensure current page is within bounds
+        if ($page > $total_pages) { $page = $total_pages; $paged = $gameModel->getGamesPaged($kategori, $urut, $keyword, $page, $perPage); $total_pages = $paged['total_pages']; }
+
+        $result = $paged['result'];
+        $resultPopuler = $gameModel->getPopulerAll();
+        $resultTerbaru = $gameModel->getTerbaruAll();
+
         view('katalog.php', [
             'result' => $result,
             'kategori_aktif' => $kategori,
             'urut_aktif' => $urut,
-            'keyword_aktif' => $keyword
+            'keyword_aktif' => $keyword,
+            'total_pages' => $total_pages,
+            'current_page' => $page,
+            'resultPopuler' => $resultPopuler,
+            'resultTerbaru' => $resultTerbaru,
         ]);
         break;
     case '/marketplace':
@@ -149,7 +171,7 @@ switch ($route) {
                         }
                     }
                     $_SESSION['cart'] = array();
-                    echo "<script>alert('Pembayaran berhasil diproses! Terima kasih telah berbelanja.'); window.location.href='index.php?route=profil';</script>";
+                    echo "<script>alert('Pembayaran berhasil diproses! Terima kasih telah berbelanja.'); window.location.href='index.php?route=marketplace&t=' + Date.now();</script>";
                     exit;
                 }
             }

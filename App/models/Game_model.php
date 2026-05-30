@@ -16,6 +16,16 @@ class Game_model {
         return $this->conn->query($query);
     }
 
+    public function getPopulerAll() {
+        $query = "SELECT * FROM games ORDER BY rating DESC";
+        return $this->conn->query($query);
+    }
+
+    public function getTerbaruAll() {
+        $query = "SELECT * FROM games ORDER BY id DESC";
+        return $this->conn->query($query);
+    }
+
     public function getGameById($id) {
         $id = intval($id);
         $query = "SELECT * FROM games WHERE id = $id";
@@ -64,6 +74,53 @@ class Game_model {
         
         return $this->conn->query($query);
     }
+
+    public function getGamesPaged($kategori = 'all', $urut = 'popular', $keyword = '', $page = 1, $perPage = 9) {
+        $page = max(1, intval($page));
+        $perPage = max(1, intval($perPage));
+
+        $where = "WHERE 1=1";
+
+        if ($kategori !== 'all') {
+            $kategori = $this->conn->real_escape_string($kategori);
+            $where .= " AND genre LIKE '%$kategori%'";
+        }
+
+        if ($keyword !== '') {
+            $keyword = $this->conn->real_escape_string($keyword);
+            $where .= " AND (judul LIKE '%$keyword%' OR genre LIKE '%$keyword%' OR spesifikasi LIKE '%$keyword%')";
+        }
+
+        $orderBy = " ORDER BY rating DESC";
+        if ($urut === 'new') {
+            $orderBy = " ORDER BY id DESC";
+        } elseif ($urut === 'price-low') {
+            $orderBy = " ORDER BY harga ASC";
+        } elseif ($urut === 'price-high') {
+            $orderBy = " ORDER BY harga DESC";
+        }
+
+        $countQuery = "SELECT COUNT(*) as cnt FROM games $where";
+        $countResult = $this->conn->query($countQuery);
+        $total = 0;
+        if ($countResult) {
+            $r = $countResult->fetch_assoc();
+            $total = intval($r['cnt']);
+        }
+
+        $totalPages = $total > 0 ? (int) ceil($total / $perPage) : 1;
+        $offset = ($page - 1) * $perPage;
+
+        $query = "SELECT * FROM games $where" . $orderBy . " LIMIT $offset, $perPage";
+        $result = $this->conn->query($query);
+
+        return [
+            'result' => $result,
+            'total_pages' => $totalPages,
+            'total_items' => $total,
+        ];
+    }
+
 
     public function tambahGame($data, $file) {
         $judul = $this->conn->real_escape_string($data['judul']);

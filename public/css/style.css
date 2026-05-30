@@ -347,6 +347,8 @@ textarea {
 
 .catalog-filter {
   display: flex;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 15px;
 }
 
@@ -359,6 +361,49 @@ textarea {
   font-size: 14px;
   outline: none;
   cursor: pointer;
+}
+
+.catalog-categories {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 20px 30px;
+  background-color: #121212;
+  border-bottom: 1px solid #333333;
+}
+
+.category-card {
+  display: block;
+  width: calc(50% - 10px);
+  min-width: 220px;
+  border: 1px solid #333333;
+  border-radius: 10px;
+  overflow: hidden;
+  text-decoration: none;
+  color: #ffffff;
+  background-color: #1a1a1a;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.category-card:hover,
+.category-card.active {
+  border-color: #ffd700;
+  transform: translateY(-3px);
+}
+
+.category-card img {
+  width: 100%;
+  display: block;
+  height: 140px;
+  object-fit: cover;
+}
+
+.category-label {
+  padding: 15px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #ffd700;
+  text-align: center;
 }
 
 .pagination {
@@ -497,6 +542,51 @@ textarea {
 .payment-method {
   margin-top: 25px;
   margin-bottom: 25px;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  display: block;
+  color: #aaaaaa;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.payment-input {
+  width: 100%;
+  background-color: #222222;
+  color: #ffffff;
+  border: 1px solid #333333;
+  padding: 12px;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.qris-code {
+  width: 100%;
+  background-color: #fff;
+  padding: 16px;
+  border-radius: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  max-width: 220px;
+  margin-bottom: 20px;
+}
+
+.qris-block {
+  width: 100%;
+  min-height: 40px;
+  border-radius: 4px;
+  background: radial-gradient(circle at 20% 20%, #000 15%, transparent 16%),
+              radial-gradient(circle at 80% 25%, #000 15%, transparent 16%),
+              radial-gradient(circle at 50% 70%, #000 18%, transparent 19%);
+  background-color: #000;
+  background-size: 100% 100%;
+  box-shadow: inset 0 0 0 2px #fff;
 }
 
 .payment-method p {
