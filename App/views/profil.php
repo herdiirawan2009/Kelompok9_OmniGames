@@ -68,7 +68,7 @@ $foto = isset($foto_profil) && $foto_profil !== '' ? $foto_profil : (!empty($_SE
         </div>
       </div>
 
-      <a href="index.php?route=developer_dashboard" class="dashboard-link">Dashboard Developer</a>
+      <a href="index.php?route=developer_dashboard" class="dashboard-link">Dashboard</a>
       <div class="dashboard-divider"></div>
 
       <a href="index.php?route=keluar" class="logout">Keluar dari Akun</a>

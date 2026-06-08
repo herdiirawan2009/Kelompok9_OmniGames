@@ -243,5 +243,15 @@ class Game_model {
         $stmt->bind_param('ii', $id, $dev_id);
         return $stmt->execute();
     }
+
+    public function getGamesBought($user_id) {
+        $uid = intval($user_id);
+        $query = "SELECT g.* FROM games g
+                  INNER JOIN detail_transaksi dt ON g.id = dt.game_id
+                  INNER JOIN transaksi t ON dt.transaksi_id = t.id
+                  WHERE t.user_id = $uid AND t.status_pembayaran = 'Lunas'
+                  ORDER BY t.tanggal_transaksi DESC";
+        return $this->conn->query($query);
+    }
 }
 ?>

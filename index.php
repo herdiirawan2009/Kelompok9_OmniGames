@@ -475,7 +475,7 @@ switch ($route) {
     case '/developer_games':
         if (!isset($_SESSION['user_id'])) { header("Location: index.php?route=masuk"); exit; }
         $gameModel = new Game_model((new Database())->getConnection());
-        $games = $gameModel->getGamesByDeveloper($_SESSION['user_id']);
+        $games = $gameModel->getGamesBought($_SESSION['user_id']);
         require_once VIEWS_PATH . 'developer_games.php';
         break;
 

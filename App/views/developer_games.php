@@ -25,8 +25,7 @@
 
     <main class="container">
       <div class="catalog-header">
-        <h2>Daftar Game Saya</h2>
-        <a href="index.php?route=developer_tambah_game" class="btn-register" style="background-color: #ffd700; color: #000;">+ Unggah Game Baru</a>
+        <h2>Game Saya</h2>
       </div>
 
       <div style="overflow-x:auto; margin-top: 20px;">
@@ -35,8 +34,8 @@
             <tr>
               <th style="padding: 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1);">Gambar</th>
               <th style="padding: 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1);">Judul Game</th>
+              <th style="padding: 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1);">Genre</th>
               <th style="padding: 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1);">Harga</th>
-              <th style="padding: 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1);">Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -47,16 +46,13 @@
                   <img src="public/Image/<?php echo htmlspecialchars($row['gambar']); ?>" alt="<?php echo htmlspecialchars($row['judul']); ?>" style="width: 120px; height: auto; border-radius: 8px;" />
                 </td>
                 <td style="padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);"><?php echo htmlspecialchars($row['judul']); ?></td>
+                <td style="padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);"><?php echo htmlspecialchars($row['genre']); ?></td>
                 <td style="padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);">Rp <?php echo number_format($row['harga'], 0, ',', '.'); ?></td>
-                <td style="padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                  <a href="index.php?route=developer_edit_game&id=<?php echo intval($row['id']); ?>" class="btn-detail">Edit</a>
-                  <a href="index.php?route=developer_hapus_game&id=<?php echo intval($row['id']); ?>" class="btn-buy" style="margin-left: 10px;" onclick="return confirm('Yakin ingin menghapus game ini?');">Hapus</a>
-                </td>
               </tr>
               <?php endwhile; ?>
             <?php else: ?>
               <tr>
-                <td colspan="4" style="padding: 20px; text-align: center; color: #ccc;">Anda belum mengunggah game apapun.</td>
+                <td colspan="4" style="padding: 20px; text-align: center; color: #ccc;">Anda belum membeli game apapun.</td>
               </tr>
             <?php endif; ?>
           </tbody>
